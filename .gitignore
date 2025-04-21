@@ -1,0 +1,7 @@
+*.pyc
+*.key
+*.crt
+__pycache__/
+.cpython*
+.vscode/
+.pio/
