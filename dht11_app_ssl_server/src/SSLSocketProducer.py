@@ -1,19 +1,19 @@
 import asyncio
 from asyncio.streams import StreamReader, StreamWriter
 import ssl
-from queue import Queue
+from collections import deque
 
 
 """SSLSocketProducer initializes an ssl.Context from given certfile and keyfile
 and creates a handler function to receive and produce msgs into a queue.
 """
 class SSLSocketProducer:
-    def __init__(self, host: str, port: int, certfile: str, keyfile: str):
+    def __init__(self, host: str, port: int, certfile: str, keyfile: str, fifo: deque):
         self._host = host # not needed here for asyncio streams
         self._port = port # not needed here for asyncio streams
         self._certfile = certfile
         self._keyfile = keyfile
-        self.msg_queue = Queue()
+        self.fifo = fifo
 
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         self.context.load_cert_chain(certfile=self._certfile,
@@ -29,7 +29,7 @@ class SSLSocketProducer:
                 if msg_bytes:
                     msg = msg_bytes.decode('utf-8')
                     print(f'Received: {msg}')
-                    self.msg_queue.put_nowait(msg)
+                    self.fifo.appendleft(msg)
                 else:
                     break
         except Exception as e:
@@ -41,9 +41,3 @@ class SSLSocketProducer:
 
     def get_context(self) -> ssl.SSLContext:
         return self.context
-
-    async def peek_queue(self) -> str:
-        return self.msg_queue[-1]
-    
-    async def pop_queue(self) -> str:
-        return self.msg_queue.get_nowait()

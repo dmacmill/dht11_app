@@ -7,6 +7,7 @@ consume that queue from a DBConsumer object.
 
 import asyncio
 from SSLSocketProducer import SSLSocketProducer
+from collections import deque
 
 HOST='0.0.0.0'
 PORT=8090
@@ -15,8 +16,9 @@ KEYFILE =  '/home/daniel/Documents/embedded_dev/esp32_projects/dht11_app/dht11_a
 
 
 async def main():
+    fifo = deque()
     ssl_socket_producer = SSLSocketProducer(
-        HOST, PORT, CERTFILE, KEYFILE
+        HOST, PORT, CERTFILE, KEYFILE, fifo
     )
     server = await asyncio.start_server(
         ssl_socket_producer.handler, 
