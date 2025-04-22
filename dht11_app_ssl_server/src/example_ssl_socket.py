@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 import socket
 import ssl
+import time
 
 HOST = '0.0.0.0'
 PORT = 8090
-CERTFILE = '/home/daniel/Documents/embedded_dev/esp32_projects/dht_app_ssl_server/dht11_doohickey/server.crt'
-KEYFILE = '/home/daniel/Documents/embedded_dev/esp32_projects/dht_app_ssl_server/dht11_doohickey/server.key'
+CERTFILE = '/home/daniel/Documents/embedded_dev/esp32_projects/dht11_app/dht11_app_ssl_server/server.crt'
+KEYFILE = '/home/daniel/Documents/embedded_dev/esp32_projects/dht11_app/dht11_app_ssl_server/server.key'
 
 # Create the underlying TCP socket
 bind_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,6 +31,8 @@ context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 # Load cert and key
 context.load_cert_chain(certfile=CERTFILE, keyfile=KEYFILE)
 
+past = time.time()
+
 try:
     while True:
         # Accept raw socket connection
@@ -39,10 +42,17 @@ try:
         # Wrap the socket with SSL
         try:
             with context.wrap_socket(client_sock, server_side=True) as ssl_sock:
-                data = ssl_sock.recv(1024)
+                data = ssl_sock.recv(65536)
                 if len(data) > 0:
                     data_str = data.decode('utf-8')
+                    now = time.time()
+                    delta = now - past
+                    print("\n\n")
+                    print(f"------{now}")
+                    print(f"------{delta}")
                     print(f"Received: {data_str}")
+                    print("-----------------------\n")
+                    past = now
         except ssl.SSLError as e:
             print(f"SSL error: {e}")
         except Exception as e:
