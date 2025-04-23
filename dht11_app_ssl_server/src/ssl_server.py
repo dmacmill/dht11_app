@@ -7,7 +7,9 @@ consume that queue from a DBConsumer object.
 
 import asyncio
 from SSLSocketProducer import SSLSocketProducer
+from DHTDBConsumer import DHTDBConsumer
 from collections import deque
+import threading
 
 HOST='0.0.0.0'
 PORT=8090
@@ -27,6 +29,11 @@ async def main():
         ssl=ssl_socket_producer.get_context()
     )
 
+    # consumer thread:
+    consumer = DHTDBConsumer(fifo)
+    threading.Thread(target=consumer.handler, daemon=True).start()
+
+    # await producer with main thread
     async with server:
         await server.serve_forever()
 

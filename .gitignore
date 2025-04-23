@@ -1,6 +1,7 @@
 *.pyc
 *.key
 *.crt
+*.db
 __pycache__/
 .cpython*
 .vscode/
