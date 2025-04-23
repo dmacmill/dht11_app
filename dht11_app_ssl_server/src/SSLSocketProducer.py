@@ -2,6 +2,7 @@ import asyncio
 from asyncio.streams import StreamReader, StreamWriter
 import ssl
 from collections import deque
+import time
 
 
 """SSLSocketProducer initializes an ssl.Context from given certfile and keyfile
@@ -21,15 +22,20 @@ class SSLSocketProducer:
 
     async def handler(self, reader: StreamReader, writer: StreamWriter):
         addr = writer.get_extra_info('peername')
-        print(f'[INFO] Connection from {addr}')
+        # print(f'[INFO] Connection from {addr}')
 
         try:
             while True:
                 msg_bytes = await reader.readline()
                 if msg_bytes:
                     msg = msg_bytes.decode('utf-8')
-                    print(f'Received: {msg}')
-                    self.fifo.appendleft(msg)
+                    print(f'\n----\nReceived: {msg}')
+                    timestamp = time.time()
+                    humidity = int(msg[10:12])
+                    tempC = float(msg[msg.find('Temperature: ')+13:msg.find('°C')])
+                    tempF = float(msg[msg.find('~')+3:msg.find('°F')])
+                    print(f'{timestamp}  {humidity}%  {tempC}°C  {tempF}°F')
+                    self.fifo.appendleft((timestamp, humidity, tempF))
                 else:
                     break
         except Exception as e:
