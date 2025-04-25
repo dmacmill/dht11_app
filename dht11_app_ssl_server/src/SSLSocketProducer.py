@@ -35,7 +35,7 @@ class SSLSocketProducer:
                     tempC = float(msg[msg.find('Temperature: ')+13:msg.find('°C')])
                     tempF = float(msg[msg.find('~')+3:msg.find('°F')])
                     print(f'{timestamp}  {humidity}%  {tempC}°C  {tempF}°F')
-                    self.fifo.appendleft((timestamp, humidity, tempF))
+                    self.fifo.appendleft((timestamp, humidity, tempC))
                 else:
                     break
         except Exception as e:

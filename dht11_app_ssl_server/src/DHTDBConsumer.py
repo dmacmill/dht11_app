@@ -4,7 +4,7 @@ import sqlite3
 
 from collections import deque
 
-DB_NAME='sensor_data.db'
+DB_NAME='../data/sensor_data.db'
 MAX_BATCH_SIZE = 50
 FLUSH_INTERVAL = 60 # seconds
 
