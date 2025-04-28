@@ -30,12 +30,17 @@ class SSLSocketProducer:
                 if msg_bytes:
                     msg = msg_bytes.decode('utf-8')
                     print(f'\n----\nReceived: {msg}')
-                    timestamp = time.time()
-                    humidity = int(msg[10:12])
-                    tempC = float(msg[msg.find('Temperature: ')+13:msg.find('°C')])
-                    tempF = float(msg[msg.find('~')+3:msg.find('°F')])
-                    print(f'{timestamp}  {humidity}%  {tempC}°C  {tempF}°F')
-                    self.fifo.appendleft((timestamp, humidity, tempC))
+                    chunks = msg.split("|")
+                    formatted = []
+                    for c in chunks:
+                        if c:
+                            ts = int(c[1:c.find(']')])
+                            hum = int(c[c.find(" ")+1:c.find("%")])
+                            tempc = float(c[c.find("%")+1:c.find("°C")])
+                            tempf = float(c[c.find("°C")+2:c.find("°F")])
+                            formatted.append((ts, hum, tempc, tempf))
+                        print(f'{ts}  {hum}%  {tempc}°C  {tempf}°F')
+                        self.fifo.appendleft((ts, hum, tempc))
                 else:
                     break
         except Exception as e:

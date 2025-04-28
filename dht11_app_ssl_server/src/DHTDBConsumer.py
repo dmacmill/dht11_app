@@ -1,3 +1,4 @@
+import os
 import threading
 import time
 import sqlite3
@@ -14,7 +15,8 @@ class DHTDBConsumer:
         
 
     def _setup_connection(self):
-        self.conn = sqlite3.connect(DB_NAME)
+        db_abspath = os.path.abspath(DB_NAME)
+        self.conn = sqlite3.connect(db_abspath)
         self.cursor = self.conn.cursor()
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS sensor_data (

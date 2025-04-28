@@ -42,6 +42,7 @@ DHT dht11(DHT11_PIN, DHT11);
 
 WiFiClientSecure client;
 
+std::string s = "";
 
 void connectToWifi() {
     Serial.println("Connecting to wifi....");
@@ -77,6 +78,8 @@ void setup() {
 }
 
 void loop() {
+    // get timestamp
+    unsigned long ts = millis();
     // read humidity
     float humi = dht11.readHumidity();
     // read temp in C
@@ -90,16 +93,21 @@ void loop() {
     else {
         // Setup "packet"
         std::stringstream ss;
-        ss << "Humidity: " << humi << "%  |  Temperature: " << tempC << "°C  ~  " << tempF << "°F";
+        ss << "[" << ts << "] " << humi << "%" << tempC << "°C" << tempF << "°F|";
         std::string result = ss.str();
 
+        s.append(result);
+
         // send over socket
+        if (s.length() >= 200) {
         if (!client.connect(HOST, PORT)) {
             Serial.println("[ERROR] connection to host lost.");
         }
         else {
-            client.print(result.c_str());
+                client.print(s.c_str());
             client.stop();
+                s = "";
+            }
         }
 
         // Display on serial (shift ctrl p -> "serial")

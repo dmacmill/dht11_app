@@ -47,10 +47,21 @@ try:
                     data_str = data.decode('utf-8')
                     now = time.time()
                     delta = now - past
+
+                    chunks = data_str.split("|")
+                    formatted = []
+                    for c in chunks:
+                        if c:
+                            ts_str = c[1:c.find(']')]
+                            hum_str = c[c.find(" ")+1:c.find("%")]
+                            tempc_str = c[c.find("%")+1:c.find("°C")]
+                            tempf_str = c[c.find("°C")+2:c.find("°F")]
+                            formatted.append((ts_str, hum_str, tempc_str, tempf_str))
+
                     print("\n\n")
                     print(f"------{now}")
                     print(f"------{delta}")
-                    print(f"Received: {data_str}")
+                    print(f"Received: {formatted}")
                     print("-----------------------\n")
                     past = now
         except ssl.SSLError as e:
