@@ -119,13 +119,14 @@ void setup() {
         getUnixTime();
         delay(1000);
     }
+    unixtime -= millis()/1000;
     client.setCACert(CA_CERT);
     dht11.begin();
 }
 
 void loop() {
     // get timestamp
-    unsigned long ts = unixtime + millis();
+    unsigned long ts = unixtime + (millis()/1000);
     // read humidity
     float humi = dht11.readHumidity();
     // read temp in C
