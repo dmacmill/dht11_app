@@ -44,6 +44,8 @@ WiFiClientSecure client;
 
 std::string s = "";
 
+long unixtime = 0;
+
 void connectToWifi() {
     Serial.println("Connecting to wifi....");
     WiFi.mode(WIFI_STA);
@@ -66,20 +68,64 @@ void connectToWifi() {
     }
 }
 
+void getUnixTime() {
+    if (!client.connect("worldtimeapi.org", 443)) {
+        Serial.println("[ERROR] connection to timezone host lost.");
+    }
+    else {
+        Serial.println("[INFO] Connected to worldtimeapi.org!");
+
+        // send GET request
+        client.println("GET /api/timezone/America/New_York HTTP/1.1");
+        client.println("Host: worldtimeapi.org");
+        client.println("User-Agent: ESP32");
+        client.println("Connection: close");
+        client.println();
+
+        // wait for server response
+        while(client.connected()) {
+            String line = client.readStringUntil('\n');
+            if (line == "\r") {
+                break;
+            }
+        }
+
+        // read and print the body
+        while(client.available()) {
+            String line = client.readStringUntil('\n');
+            if (line.length() > 0) {
+                int index = line.indexOf("\"unixtime\":");
+                if (index >= 0) {
+                    int start = index + 11;
+                    int end = line.indexOf(",", start);
+                    String unixTimeStr = line.substring(start, end);
+                    unixtime = unixTimeStr.toInt();
+                    Serial.println(unixtime);
+                }
+            }
+            Serial.println(line);
+        }
+        client.stop();
+        Serial.println("[INFO] worldtimeapi.org connection closed");
+    }
+}
+
 void setup() {
     Serial.begin(9600);
     
     connectToWifi();
-
+    client.setInsecure();
+    while (unixtime == 0) {
+        getUnixTime();
+        delay(1000);
+    }
     client.setCACert(CA_CERT);
-    // client.setInsecure();
-
     dht11.begin();
 }
 
 void loop() {
     // get timestamp
-    unsigned long ts = millis();
+    unsigned long ts = unixtime + millis();
     // read humidity
     float humi = dht11.readHumidity();
     // read temp in C
