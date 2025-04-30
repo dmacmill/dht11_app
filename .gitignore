@@ -6,3 +6,4 @@ __pycache__/
 .cpython*
 .vscode/
 .pio/
+dht11_app/include/credentials.hpp
