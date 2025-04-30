@@ -1,6 +1,4 @@
-#include <Arduino.h>
 #include <DHT.h>
-#include <WiFiClientSecure.h>
 #include <sstream>
 
 #include "client.hpp"
