@@ -90,4 +90,24 @@ long int getUnixTime(WiFiClientSecure & client) {
     return unixtime;
 }
 
+/* @brief send - sends a string over the socket to the host
+ * 
+ * @param client - an external WifiClientSecure that is already connected to the internet.
+ * @param s - the string to send over the socket
+ * @return int - true if successful, false if not
+ */
+bool send(WiFiClientSecure & client, const std::string & s) {
+    bool success = true;
+    // send over socket
+    if (!client.connect(HOST, PORT)) {
+        Serial.println("connection to host lost.");
+        success = false;
+    }
+    else {
+        client.print(s.c_str());
+        client.stop();
+    }
+    return success;
+}
+
 #endif // CLIENT_HPP_
