@@ -8,11 +8,11 @@ This project demonstrates how to interface a DHT11 temperature and humidity sens
 - Outputs data to the serial monitor.
 - Periodically sends data in batches to the specified HOST and PORT ssl/tls socket. Data is in the rough form:
 
-`[1746052826] 60%22.6°C72.68°F|[1746052828] 60%22.8°C73.04°F|[1746052830] 60%22.4°C72.32°F|[1746052832] 60%22.5°C72.5°F|[1746052834] 60%22.7°C72.86°F|[1746052836] 60%22.1°C71.78°F|[1746052838] 61%22.3°C72.14°F|`
+`[1746119310],57,24.1,75.38|[1746119312],57,24.4,75.92|[1746119314],58,24.7,76.46|[1746119316],58,24.6,76.28|[1746119318],58,24.6,76.28|[1746119320],58,24.4,75.92|[1746119322],58,24.7,76.46|[1746119324],57,24.1,75.38|`
 
 ## Prerequisites
 - ESP32 feather development board.
-- DHT11 sensor.
+- DHT11 sensor with data pin plugged to pin 21.
 - Arduino IDE or PlatformIO installed on your system.
 
 ## Setup Instructions

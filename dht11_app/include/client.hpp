@@ -8,6 +8,7 @@
 
 void connectToWifi(WiFiClientSecure & client, const char wifi_network [], const char wifi_password [], const int & wifi_timeout_ms);
 long int getUnixTime(WiFiClientSecure & client);
+bool send(WiFiClientSecure & client, const char host [], const int port, const std::string & s);
 
 
 /* @brief connectToWifi - attempt to connect to given WifiSecureClient with given SSID credentials and timeout > 0
@@ -96,11 +97,10 @@ long int getUnixTime(WiFiClientSecure & client) {
  * @param s - the string to send over the socket
  * @return int - true if successful, false if not
  */
-bool send(WiFiClientSecure & client, const std::string & s) {
+bool send(WiFiClientSecure & client, const char host [], const int port, const std::string & s) {
     bool success = true;
     // send over socket
-    if (!client.connect(HOST, PORT)) {
-        Serial.println("connection to host lost.");
+    if (!client.connect(host, port)) {
         success = false;
     }
     else {

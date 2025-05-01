@@ -42,9 +42,12 @@ void loop() {
         Serial.println("[ERROR] Failed to read from DHT11 sensor!");
         // send over socket
         if (s.length() >= 200) {
-            int success = send(client, s);
+            int success = send(client, HOST, PORT, s);
             if (success) {
                 s = "";
+            }
+            else{
+                s += "[ERROR] lost connection|";
             }
         }
     }
@@ -59,9 +62,12 @@ void loop() {
 
         // send over socket
         if (s.length() >= 200) {
-            int success = send(client, s);
+            int success = send(client, HOST, PORT, s);
             if (success) {
                 s = "";
+            }
+            else {
+                s += "[ERROR] lost connection|";
             }
         }
 
