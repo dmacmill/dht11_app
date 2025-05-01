@@ -16,9 +16,14 @@ void setup() {
     
     connectToWifi(client, WIFI_NETWORK, WIFI_PASSWORD, WIFI_TIMEOUT_MS);
     client.setInsecure();
-    while (unixtime == 0) {
+    int trys = 0;
+    while (unixtime == 0 && trys < 5) {
+        trys++;
         unixtime = getUnixTime(client);
         delay(1000);
+    }
+    if (unixtime == 0) {
+        s += "[ERROR] couldn't get unix time. Time will start at 0.|";
     }
     unixtime -= millis()/1000;
     client.setCACert(CA_CERT);
@@ -26,35 +31,43 @@ void setup() {
 }
 
 void loop() {
-    // get timestamp
     unsigned long ts = unixtime + (millis()/1000);
-    // read humidity
     float humi = dht11.readHumidity();
-    // read temp in C
     float tempC = dht11.readTemperature();
-    // read temp in F
     float tempF = dht11.readTemperature(true);
 
     if (isnan(tempC) || isnan(tempF) || isnan(humi)) {
+        // Handle read failure
+        s += "[ERROR] Failed to read from DHT11 sensor!|";
         Serial.println("[ERROR] Failed to read from DHT11 sensor!");
+        // send over socket
+        if (s.length() >= 200) {
+            int success = send(client, HOST, PORT, s);
+            if (success) {
+                s = "";
+            }
+            else{
+                s += "[ERROR] lost connection|";
+            }
+        }
     }
     else {
         // Setup "packet"
         std::stringstream ss;
-        ss << "[" << ts << "] " << humi << "%" << tempC << "°C" << tempF << "°F|";
+        // ss << "[" << ts << "] " << humi << "%" << tempC << "°C" << tempF << "°F|";
+        ss << "[" << ts << "]," << humi << "," << tempC << "," << tempF << "|";
         std::string result = ss.str();
 
         s.append(result);
 
         // send over socket
         if (s.length() >= 200) {
-            if (!client.connect(HOST, PORT)) {
-                Serial.println("[ERROR] connection to host lost.");
+            int success = send(client, HOST, PORT, s);
+            if (success) {
+                s = "";
             }
             else {
-                client.print(s.c_str());
-                client.stop();
-                s = "";
+                s += "[ERROR] lost connection|";
             }
         }
 

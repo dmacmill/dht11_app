@@ -8,6 +8,7 @@
 
 void connectToWifi(WiFiClientSecure & client, const char wifi_network [], const char wifi_password [], const int & wifi_timeout_ms);
 long int getUnixTime(WiFiClientSecure & client);
+bool send(WiFiClientSecure & client, const char host [], const int port, const std::string & s);
 
 
 /* @brief connectToWifi - attempt to connect to given WifiSecureClient with given SSID credentials and timeout > 0
@@ -88,6 +89,25 @@ long int getUnixTime(WiFiClientSecure & client) {
         Serial.println("[INFO] worldtimeapi.org connection closed");
     }
     return unixtime;
+}
+
+/* @brief send - sends a string over the socket to the host
+ * 
+ * @param client - an external WifiClientSecure that is already connected to the internet.
+ * @param s - the string to send over the socket
+ * @return int - true if successful, false if not
+ */
+bool send(WiFiClientSecure & client, const char host [], const int port, const std::string & s) {
+    bool success = true;
+    // send over socket
+    if (!client.connect(host, port)) {
+        success = false;
+    }
+    else {
+        client.print(s.c_str());
+        client.stop();
+    }
+    return success;
 }
 
 #endif // CLIENT_HPP_

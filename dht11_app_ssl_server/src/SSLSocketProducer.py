@@ -38,14 +38,15 @@ class SSLSocketProducer:
                     formatted = []
                     for c in chunks:
                         if c:
-                            # todo: simplify the message itself, make it just 1745970664,48,22,71.6
-                            ts = int(c[1:c.find(']')])
-                            hum = int(c[c.find(" ")+1:c.find("%")])
-                            tempc = float(c[c.find("%")+1:c.find("°C")])
-                            tempf = float(c[c.find("°C")+2:c.find("°F")])
-                            formatted.append((ts, hum, tempc, tempf))
-                            print(f'{ts}  {hum}%  {tempc}°C  {tempf}°F')
-                            self.fifo.appendleft((ts, hum, tempc))
+                            if c.find('[ERROR]') != -1:
+                                print(f"{c}")
+                            else:
+                                ts_str = c[1:c.find(']')]
+                                (hum_str, tempc_str, tempf_str) = c.split("]")[1].split(",")[1:]
+                                (ts, hum, tempc, tempf) = (int(ts_str), int(hum_str), float(tempc_str), float(tempf_str))
+                                formatted.append((ts, hum, tempc, tempf))
+                                print(f'{ts}  {hum}%  {tempc}°C  {tempf}°F')
+                                self.fifo.appendleft((ts, hum, tempc))
                 else:
                     break
         except Exception as e:

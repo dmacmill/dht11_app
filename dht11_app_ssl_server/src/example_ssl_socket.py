@@ -52,11 +52,15 @@ try:
                     formatted = []
                     for c in chunks:
                         if c:
-                            ts_str = c[1:c.find(']')]
-                            hum_str = c[c.find(" ")+1:c.find("%")]
-                            tempc_str = c[c.find("%")+1:c.find("°C")]
-                            tempf_str = c[c.find("°C")+2:c.find("°F")]
-                            formatted.append((ts_str, hum_str, tempc_str, tempf_str))
+                            if c.find('[ERROR]') != -1:
+                                print(f"{c}")
+                            else:
+                                print(f"{c}")
+                                ts_str = c[1:c.find(']')]
+                                (hum_str, tempc_str, tempf_str) = c.split("]")[1].split(",")[1:]
+                                formatted.append(
+                                    (int(ts_str), int(hum_str), float(tempc_str), float(tempf_str))
+                                )
 
                     print("\n\n")
                     print(f"------{now}")
