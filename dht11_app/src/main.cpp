@@ -2,7 +2,7 @@
  * dht11.cpp
  * 
  * task to get from dht11 sensor and write to queue
- * task to empty the queue after a time 
+ * task to empty the queue after a time and send results to secure socket.
  * 
 */
 
@@ -82,7 +82,6 @@ void measureTask(void * parameter) {
 
         float humi = dht11.readHumidity();
         float tempC = dht11.readTemperature();
-        float tempF = isnan(tempC) ? -9999.0 : tempC * 1.8 + 32.0;
 
         Serial.println("[INFO] done reading from sensor");
 
@@ -107,7 +106,7 @@ void measureTask(void * parameter) {
             char buf [MSG_SIZE];
             memset(buf, 0, sizeof(buf));
             strcpy(buf, result.c_str());
-            // Serial.println("[INFO] inserting into queue");
+
             if (xQueueSend(msg_queue, &buf, 10) != pdTRUE) {
                 Serial.println("measureTask: msg_queue is full");
             }
@@ -158,6 +157,7 @@ void setup () {
     xTaskCreatePinnedToCore(sendTask, "print from queue task", 8192, NULL, 1, NULL, app_cpu);
     xTaskCreatePinnedToCore(measureTask, "measure into queue task", 4096, NULL, 2, NULL, app_cpu);
 
+    // gets rid of loop() task. still needs to exist though.
     vTaskDelete(NULL);
 }
 
