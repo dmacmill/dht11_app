@@ -20,9 +20,10 @@ static const BaseType_t app_cpu = 1;
 #endif
 
 // globals
-static const uint8_t msg_queue_len = 5;
+static const uint8_t msg_queue_len = 10;
 static QueueHandle_t msg_queue;
-static const size_t MSG_SIZE = 100;
+static const size_t MSG_SIZE = 200;
+static const uint32_t SENDTASK_MS = 20000;
 
 #define DHT11_PIN 21
 static DHT dht11(DHT11_PIN, DHT11);
@@ -55,11 +56,14 @@ void sendTask(void * parameter) {
                 if (!client.connect(HOST, PORT)) {
                     Serial.println("[ERROR] lost connection");
                 }
+                else {
+                    send(client, HOST, PORT, s.c_str());
+                }
             }
         }
         s = "";
         
-        vTaskDelay(6000 / portTICK_PERIOD_MS);
+        vTaskDelay(SENDTASK_MS / portTICK_PERIOD_MS);
     }
 }
 

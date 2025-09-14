@@ -100,7 +100,7 @@ long int getUnixTime(WiFiClientSecure & client) {
 bool send(WiFiClientSecure & client, const char host [], const int port, const std::string & s) {
     bool success = true;
     // send over socket
-    if (!client.connect(host, port)) {
+    if (!client.connected()) {
         success = false;
     }
     else {
